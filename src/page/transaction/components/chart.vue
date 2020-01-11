@@ -1,31 +1,108 @@
 <template>
   <div class="chart">
-    <van-tabs v-model="timer" background="#20212A" line-height="0" title-active-color="#2F98FF">
-      <van-tab title="分时">分时</van-tab>
-      <van-tab title="日K">日K</van-tab>
-      <van-tab title="周K">周K</van-tab>
-      <van-tab title="月K">月K</van-tab>
-    </van-tabs>
+      <van-row>
+        <van-col span="6" @click="handleBranch" id="branch">分时</van-col>
+        <van-col span="6" @click="handleDaily" id="daily">日k</van-col>
+        <van-col span="6" @click="handleWeek" id="week">周k</van-col>
+        <van-col span="6" @click="handleMonth" id="month">月k</van-col>
+      </van-row>
+      <Branch v-if="branch"/>
+      <Daily v-if="daily"/>
+      <Week v-if="week"/>
+      <Month v-if="month"/>
   </div>
 </template>
 
 <script>
+import Branch from "./branch"
+import Daily from "./daily"
+import Week from "./week"
+import Month from "./month"
+
 export default {
   name: "Chart",
+  components: {
+    Branch,
+    Daily,
+    Week,
+    Month
+  },
   props: {},
   data() {
     return {
-      timer: 0
+      branch: true,
+      daily:false,
+      week:false,
+      month:false,
     };
   },
-  methods: {}
+  methods: {
+    /** 
+     * 分
+     */
+    handleBranch () {
+      this.branch = true
+      this.daily = false
+      this.week = false
+      this.month = false
+      document.getElementById('branch').style.color = '#2F98FF'
+      document.getElementById('daily').style.color = '#7f819b'
+      document.getElementById('week').style.color = '#7f819b'
+      document.getElementById('month').style.color = '#7f819b'
+    },
+    /**
+     * 日
+     */
+    handleDaily () {
+      this.branch = false
+      this.daily = true
+      this.week = false
+      this.month = false
+      document.getElementById('daily').style.color = '#2F98FF'
+      document.getElementById('branch').style.color = '#7f819b'
+      document.getElementById('week').style.color = '#7f819b'
+      document.getElementById('month').style.color = '#7f819b'
+    },
+    /**
+     * 周
+     */
+    handleWeek () {
+      this.daily = false
+      this.branch = false
+      this.week = true
+      this.month = false
+      document.getElementById('daily').style.color = '#7f819b'
+      document.getElementById('branch').style.color = '#7f819b'
+      document.getElementById('week').style.color = '#2F98FF'
+      document.getElementById('month').style.color = '#7f819b'
+    },
+    /**
+     * 月
+     */
+    handleMonth () {
+      this.daily = false
+      this.branch = false
+      this.week = false
+      this.month = true
+      document.getElementById('daily').style.color = '#7f819b'
+      document.getElementById('branch').style.color = '#7f819b'
+      document.getElementById('week').style.color = '#7f819b'
+      document.getElementById('month').style.color = '#2F98FF'
+    }
+
+  },
 };
 </script>
 <style lang='less' scoped>
-.chart {
-  padding: 0 15px;
-  .van-tab__pane {
-    height: 220px;
+  .van-row {
+    height: 43px;
+    line-height: 43px;
+    font-size: 14px;
+    color:#7f819b;;
+    text-align: center;
+    #branch {
+      color: #2F98FF;
+    }
   }
-}
+
 </style>

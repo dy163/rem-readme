@@ -24,33 +24,33 @@
       <van-list>
         <div v-for="item in list" :key="item.id">
           <p>
-            {{ item.stock_name }}
-            <span>{{ item.stock_code }}</span>
+            {{ item.title }}
+            <span>{{ item.identifier }}</span>
           </p>
           <div class="inquire-list">
             <van-row type="flex" justify="space-between">
-              <van-col span="6">买卖方向</van-col>
-              <van-col span="6">{{ item.buy_or_sell }}</van-col>
+              <van-col span="6">委托方向</van-col>
+              <van-col span="6">{{ item.sell? item.sell:item.buy }}</van-col>
               <van-col span="6">成交状态</van-col>
               <van-col span="6">已成</van-col>
             </van-row>
-            <!-- <van-row>
-              <van-col span="6">买卖价格</van-col>
+            <van-row>
+              <van-col span="6">委托价格</van-col>
               <van-col span="6">{{ item.entrust }}</van-col>
               <van-col span="6">委托数量</van-col>
               <van-col span="6">{{ item.entrustAmount }}</van-col>
-            </van-row> -->
+            </van-row>
             <van-row>
               <van-col span="6">成交金额</van-col>
-              <van-col span="6">{{ item.amount }}</van-col>
+              <van-col span="6">{{ item.money }}</van-col>
               <van-col span="6">成交价格</van-col>
-              <van-col span="6">{{ item.price }}</van-col>
+              <van-col span="6">{{ item.clinch }}</van-col>
             </van-row>
             <van-row>
               <van-col span="6">成交数量</van-col>
-              <van-col span="6">{{ item.quantity }}</van-col>
-              <van-col span="4">成交时间</van-col>
-              <van-col span="8">{{ item.time }}</van-col>
+              <van-col span="6">{{ item.clinchAmount }}</van-col>
+              <van-col span="6">委托时间</van-col>
+              <van-col span="6">{{ item.time }}</van-col>
             </van-row>
           </div>
         </div>
@@ -60,7 +60,7 @@
     </div>
     <!-- 展示历史查询遮罩 -->
     <div>
-      <van-popup v-model="showes" position="top" @click-overlay='close' @click='close'>
+      <van-popup v-model="showes" position="top">
         <p class="time-header">自定义时间：</p>
         <div>
           <van-row>
@@ -112,7 +112,6 @@
 </template>
 
 <script>
-import { bargainHistory, bargainToday } from "@/api/stock";
 
 export default {
   name: "Inquire",
@@ -131,12 +130,42 @@ export default {
       starttime1: "", //开始时间时间戳
       endtime: "", //结束时间
       endtime1: "", //结束时间时间戳
-      list: []
+      list: [
+        {
+          title: "贵州茅台",
+          identifier: "102931",
+          sell: "证券卖出",
+          entrust: "16.23",
+          entrustAmount: "100",
+          money: "510",
+          clinch: "16.23",
+          clinchAmount: "100",
+          time: "09:47:48"
+        },
+        {
+          title: "贵州茅台",
+          identifier: "102931",
+          sell: "证券卖出",
+          entrust: "16.23",
+          entrustAmount: "100",
+          money: "510",
+          clinch: "16.23",
+          clinchAmount: "100",
+          time: "09:47:48"
+        },
+        {
+          title: "贵州茅台",
+          identifier: "102931",
+          buy: "证券卖入",
+          entrust: "16.23",
+          entrustAmount: "100",
+          money: "510",
+          clinch: "16.23",
+          clinchAmount: "100",
+          time: "09:47:48"
+        }
+      ]
     };
-  },
-  created(){
-    this.$toast.setDefaultOptions({ duration: 800 });   // vant 消息提示展示时间
-    this.handleToday()
   },
   methods: {
     onLoad() {
@@ -153,11 +182,6 @@ export default {
         }
       }, 500);
     },
-    close() {
-      this.show3 = false
-      this.showes = false
-      this.show2 = true
-    },
     /**
      * 历史查询点击事件
      */
@@ -171,6 +195,14 @@ export default {
       this.showes = false
       this.show2 = true
     },
+    handleToday() {
+      this.show3 = false
+      this.showes = false
+      this.show2 = true
+    },
+
+
+
     /**
      * 自定义时间选择器
      */
@@ -222,7 +254,18 @@ export default {
       }
       return value;
     },
-
+    /**
+     * 加载今天数据
+     */
+    async handleDelivery() {
+      try {
+        const formData = new FormData();
+        // const res = await deliveryOrderGetList(formData);
+        this.list = res.data.result;
+      } catch (error) {
+        this.$toast("失败了");
+      }
+    },
     /**
      * 自定义时间确定按钮
      */
@@ -238,76 +281,40 @@ export default {
           formData.append("time_range", 6);
           formData.append("min", min);
           formData.append("max", max);
-          const res = await bargainHistory(formData);
+          // const res = await deliveryOrderGetList(formData);
           this.list = res.data.result;
-          // 判断展示登录状态
-          if(!res.data.status) {
-            this.$toast("请登录后查看");
-          } else {
-            this.$toast("获取自定义列表成功");
-          }
+          this.$toast("获取自定义列表成功");
         }
       } catch (error) {
         this.$toast("获取失败");
       }
     },
     /**
-     * 今日成交列表查询
-     */
-    async handleToday() {
-      this.show3 = false
-      this.showes = false
-      this.show2 = true
-      try {
-        const formData = new FormData();
-        const res = await bargainToday(formData);
-        this.list = res.data.result;
-        // 判断展示登录状态
-        if(!res.data.status) {
-          this.$toast("请登录后查看");
-        } else {
-          this.$toast("获取今日成交列表成功");
-        }
-      } catch (error) {
-        
-      }
-    },
-    /**
-     * 一周点击
+     * 周点击
      */
     async handleColseWeek() {
       this.showes = false;
       try {
         const formData = new FormData();
         formData.append("time_range", 1);
-        const res = await bargainHistory(formData);
+        // const res = await deliveryOrderGetList(formData);
         this.list = res.data.result;
-        // 判断展示登录状态
-        if(!res.data.status) {
-          this.$toast("请登录后查看");
-        } else {
-          this.$toast("获取周列表成功");
-        }
+        this.$toast("获取周列表成功");
       } catch (error) {
         this.$toast("获取失败");
       }
     },
     /**
-     * 一月点击
+     * 月点击
      */
     async handleColseJanuary() {
       this.showes = false;
       try {
         const formData = new FormData();
         formData.append("time_range", 2);
-        const res = await bargainHistory(formData);
+        // const res = await deliveryOrderGetList(formData);
         this.list = res.data.result;
-        // 判断展示登录状态
-        if(!res.data.status) {
-          this.$toast("请登录后查看");
-        } else {
-          this.$toast("获取一月列表成功");
-        }
+        this.$toast("获取一月列表成功");
       } catch (error) {
         this.$toast("获取失败");
       }
@@ -320,14 +327,9 @@ export default {
       try {
         const formData = new FormData();
         formData.append("time_range", 3);
-        const res = await bargainHistory(formData);
+        // const res = await deliveryOrderGetList(formData);
         this.list = res.data.result;
-        // 判断展示登录状态
-        if(!res.data.status) {
-          this.$toast("请登录后查看");
-        } else {
-          this.$toast("获取三月列表成功");
-        }
+        this.$toast("获取三月列表成功");
       } catch (error) {
         this.$toast("获取失败");
       }
@@ -340,14 +342,9 @@ export default {
       try {
         const formData = new FormData();
         formData.append("time_range", 4);
-        const res = await bargainHistory(formData);
+        // const res = await deliveryOrderGetList(formData);
         this.list = res.data.result;
-        // 判断展示登录状态
-        if(!res.data.status) {
-          this.$toast("请登录后查看");
-        } else {
-          this.$toast("获取半年列表成功");
-        }
+        this.$toast("获取半年列表成功");
       } catch (error) {
         this.$toast("获取失败");
       }
@@ -360,14 +357,9 @@ export default {
       try {
         const formData = new FormData();
         formData.append("time_range", 5);
-        const res = await bargainHistory(formData);
+        // const res = await deliveryOrderGetList(formData);
         this.list = res.data.result;
-        // 判断展示登录状态
-        if(!res.data.status) {
-          this.$toast("请登录后查看");
-        } else {
-          this.$toast("获取一年列表成功");
-        }
+        this.$toast("获取一年列表成功");
       } catch (error) {
         this.$toast("获取失败");
       }
@@ -401,7 +393,7 @@ export default {
     .van-row {
       font-size: 13px;
       color: rgba(124, 124, 130, 1);
-      padding-bottom: 10px;
+      padding-bottom: 8px;
       .van-col {
         text-align: left;
       }
@@ -412,12 +404,11 @@ export default {
       .van-col:nth-child(2) {
         padding-right: 8px;
       }
-      .van-col:nth-child(4) {
-        font-size: 12px;
-        white-space: nowrap;
+      .van-col:nth-child(3) {
+        padding-left: 8px;
       }
     }
-    .van-row:nth-child(3) {
+    .van-row:nth-child(4) {
       padding-bottom: 0;
     }
   }

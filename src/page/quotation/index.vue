@@ -21,7 +21,7 @@
         </p>
       </div>
       <div class="nil"></div>
-      <van-pull-refresh v-model="isLoading" @refresh="onRefresh">      
+      <van-pull-refresh v-model="isLoading" @refresh="onRefresh">    
         <van-list>
           <div
             class="quotation-content-top"
@@ -29,6 +29,7 @@
             :key="index"
             @click="handleTranscation(item)"
           >
+          
             <div>
               <p>{{ item.stock_name }}</p>
               <p>
@@ -53,8 +54,6 @@
 
 <script>
 import { getList } from "@/api/stock";
-// import { throttle } from "lodash";  //  **************
-
 export default {
   name: "QuotationIndex",
   data() {
@@ -62,22 +61,19 @@ export default {
       isLoading: false,
       loading: false,
       finished: false,
-      stock: [],
-      // time:null   //   **********
+      stock: []
     };
   },
-  // computed: {
-  //   sex:throttle( function () {
-  //     console.log(123132132)
-  //     this.loadStock();
-  //   },1000)
-  // },
   /**
    * 提前加载
    */
   // 
   mounted() {
-    this.loadStock();
+    // window.setInterval(() => {
+    //     setTimeout(()=> {
+          this.loadStock();
+    //     }, 0)
+    // }, 3000)
   },
   /**
    * 方法

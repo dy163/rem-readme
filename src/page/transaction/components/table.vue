@@ -14,12 +14,10 @@
         <!-- <p>{{ 123456789123 }}</p> -->
       </div>
       <div class="table-number-gain">
-        <p>+73.950</p>
+        <!-- <p>+73.950</p> -->
+        <p>{{ }}</p>
         <p>{{list.rise_or_fall_rate}}</p>
       </div>
-      <!-- <div class="table-img">
-          <img src="@/assets/img/pointing.png" alt />
-      </div>-->
     </div>
     <!-- 指数动态信息 -->
     <div class="table-list">
@@ -135,7 +133,11 @@ export default {
         const formData = new FormData();
         formData.append("stock_code", this.showList.stock_code);
         const res = await getList(formData)
-        this.list = res.data.result[0]
+        if(res.data.result[0] === undefined) {
+          return
+        } else {
+          this.list = res.data.result[0]
+        }
       } catch (error) {
         this.$toast('行情列表详情失败')
       }
